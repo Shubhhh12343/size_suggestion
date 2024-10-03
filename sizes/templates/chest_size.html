@@ -7,33 +7,78 @@
     <title>Size Suggestion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: white;
+        }
+
+        .card {
+            max-width: 400px;
+            width: 100%;
+            height: 100%;
+            max-height: 210px;
+            background-color: #ececec;
+        }
+
         .form-step {
-            display: none;
+            display: none; /* Hide all steps by default */
         }
 
         .form-step-active {
-            display: block;
+            display: block; /* Show only the active step */
         }
 
-        .form-hidden {
-            display: none;
+        .form-section {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background-color: #ececec;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .form-header-text {
+            text-align: left;
+        }
+
+        .let-go-btn {
+            margin-left: auto;
+        }
+
+        .img-fit {
+            width: 100%;
+            max-width: 150px;
         }
     </style>
 </head>
 
-<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    <div class="card shadow-sm p-4" style="max-width: 500px; width: 100%;">
-        <div class="card-body text-center">
-            <h1 class="card-title mb-4">Find Your Size</h1>
+<body class="d-flex justify-content-center align-items-center vh-100 bg-dange">
+    <div class="card shadow-sm">
+        <div class="card-body">
 
-            <!-- Form Section -->
-            <form method="post" id="sizeForm" class="form-group {% if suggestion %} form-hidden {% endif %}">
+            <form method="post" id="sizeForm" action="{% url 'chest_size' %}" class="form-group">
                 {% csrf_token %}
 
-                <!-- Step 1: Gender Selection -->
-                <div class="form-step form-step-active" id="step-1">
-                    <div class="mb-3">
-                        <label for="gender" class="form-label">Select Gender:</label>
+                <!-- Step 1: Initial Prompt -->
+                <div class="form-step {% if not suggestion %} form-step-active {% endif %}" id="step-1">
+                    <div class="form-section">
+                        <h class="form-header-text">FINDING YOUR PERFECT FIT?</h>
+                        <p>You are just a few clicks away...</p>
+                    </div>
+                    <div class="form-footer">
+                        <button type="button" class="btn btn-primary let-go-btn" onclick="nextStep()">Let's Go</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Gender Selection -->
+                <div class="form-step {% if not suggestion %} d-none {% endif %}" id="step-2">
+                    <div class="form-section">
+                        <h class="form-header-text">SELECT YOUR GENDER</h>
+                        <p>Help us identify your preference.</p>
                         <div class="d-flex justify-content-center">
                             <div class="form-check form-check-inline">
                                 <input type="radio" id="male" name="gender" value="male" class="form-check-input" required>
@@ -45,66 +90,75 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary float-end" onclick="nextStep()">Next</button>
-                </div>
-
-                <!-- Step 2: Clothing Type Selection -->
-                <div class="form-step" id="step-2">
-                    <div class="mb-3">
-                        <label for="clothing_type" class="form-label">Select Clothing Type:</label>
-                        <select name="clothing_type" id="clothing_type" class="form-select" required>
-                            <option value="" selected disabled>-- Select --</option>
-                            <option value="top">Top</option>
-                            <option value="bottom">Bottom</option>
-                        </select>
-                    </div>
-                    <div class="d-flex justify-content-between">
+                    <div class="form-footer">
                         <button type="button" class="btn btn-secondary" onclick="prevStep()">Back</button>
-                        <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                        <button type="button" class="btn btn-primary let-go-btn" onclick="nextStep()">Let's Go</button>
                     </div>
                 </div>
 
-                <!-- Step 3: Size Input -->
-                <div class="form-step" id="step-3">
-                    <div class="mb-3">
-                        <label for="size_input" class="form-label">Enter Size:</label>
-                        <input type="text" id="size_input" name="size_input" class="form-control" placeholder="Enter your size (e.g. 36)" required>
+                <!-- Step 3: Clothing Type Selection -->
+                <div class="form-step {% if not suggestion %} d-none {% endif %}" id="step-3">
+                    <div class="form-section">
+                        <h class="form-header-text">WHAT ARE YOU LOOKING FOR?</h>
+                        <p>Are you looking for tops or bottoms?</p>
+                        <div class="d-flex justify-content-center">
+                            <div class="form-check form-check-inline">
+                                <input type="radio" id="top" name="clothing_type" value="top" class="form-check-input" required>
+                                <label for="top" class="form-check-label">Tops/Shirts</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" id="bottom" name="clothing_type" value="bottom" class="form-check-input" required>
+                                <label for="bottom" class="form-check-label">Bottoms/Jeans</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between">
+                    <div class="form-footer">
                         <button type="button" class="btn btn-secondary" onclick="prevStep()">Back</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary let-go-btn" onclick="nextStep()">Let's Go</button>
                     </div>
                 </div>
+
+                <!-- Step 4: Size Input -->
+                <div class="form-step {% if not suggestion %} d-none {% endif %}" id="step-4">
+                    <div class="form-section">
+                        <h class="form-header-text">ENTER YOUR SIZE</h>
+                        <input type="text" id="size_input" name="size_input" class="form-control" placeholder="Enter your size (e.g., 36)" required>
+                    </div>
+                    <div class="form-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">Back</button>
+                        <button type="submit" class="btn btn-primary let-go-btn">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Size Suggestion -->
+                <div class="form-step {% if suggestion %} form-step-active {% endif %}" id="step-5">
+                    <div class="form-section d-flex align-items-center">
+                        <img src="https://plus.unsplash.com/premium_photo-1689327920656-bcfe8a9709fa?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHQlMjBzaGlydCUyMG1vZGVsfGVufDB8fDB8fHww" alt="Fit image"  height="200px" width="250px">
+                        <div class="ms-3">
+                            <h>WE HAVE GOT A FIT FOR YOU</h>
+                            {% if suggestion %}
+                            <p>A <strong>{{ suggestion.size }}</strong> sized chosen from {{ clothing_type }}.</p>
+                            {% if gender == 'male' and clothing_type == 'top' %}
+                            <p>Chest: {{ suggestion.chest }}, Length: {{ suggestion.length }}</p>
+                            {% elif gender == 'female' and clothing_type == 'top' %}
+                            <p>Chest: {{ suggestion.chest }}, Length: {{ suggestion.length }}</p>
+                            {% elif gender == 'male' and clothing_type == 'bottom' %}
+                            <p>Waist: {{ suggestion.waist }}, Hip: {{ suggestion.hip }}</p>
+                            {% elif gender == 'female' and clothing_type == 'bottom' %}
+                            <p>Waist: {{ suggestion.waist }}, Hip: {{ suggestion.hip }}</p>
+                            {% endif %}
+                            {% else %}
+                            <p>No matching size found for your input.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <button type="button" class="btn btn-primary let-go-btn" onclick="tryNext()">Try Next!</button>
+                    </div>
+                </div>
+
             </form>
 
-            <!-- Suggestion Display -->
-            {% if suggestion %}
-            <div class="alert alert-success mt-4">
-                <h2>Your Suggested Size:</h2>
-                <p>Size: <strong>{{ suggestion.size }}</strong></p>
-
-                <!-- Male Top -->
-                {% if gender == 'male' and clothing_type == 'top' %}
-                <p>Chest: {{ suggestion.chest }}</p>
-                <p>Length: {{ suggestion.length }}</p>
-                <!-- Male Bottom -->
-                {% elif gender == 'male' and clothing_type == 'bottom' %}
-                <p>Waist: {{ suggestion.waist }}</p>
-                <p>Inseam Length: {{ suggestion.inseam_length }}</p>
-                <p>Hip: {{ suggestion.hip }}</p>
-                <!-- Female Top -->
-                {% elif gender == 'female' and clothing_type == 'top' %}
-                <p>Chest: {{ suggestion.chest }}</p>
-                <p>Length: {{ suggestion.length }}</p>
-                <p>Sleeve Length: {{ suggestion.sleeve_length }}</p>
-                <!-- Female Bottom -->
-                {% elif gender == 'female' and clothing_type == 'bottom' %}
-                <p>Waist: {{ suggestion.waist }}</p>
-                <p>Inseam Length: {{ suggestion.inseam_length }}</p>
-                <p>Hip: {{ suggestion.hip }}</p>
-                {% endif %}
-            </div>
-            {% endif %}
         </div>
     </div>
 
@@ -114,26 +168,45 @@
     <script>
         let currentStep = 1;
 
-        function showStep(step) {
-            document.querySelectorAll('.form-step').forEach(function(stepElement) {
-                stepElement.classList.remove('form-step-active');
-            });
-            document.getElementById('step-' + step).classList.add('form-step-active');
-        }
+function showStep(step) {
+    document.querySelectorAll('.form-step').forEach(function(stepElement) {
+        stepElement.classList.remove('form-step-active');
+        stepElement.classList.add('d-none'); // Hide all steps
+    });
+    document.getElementById('step-' + step).classList.remove('d-none');
+    document.getElementById('step-' + step).classList.add('form-step-active'); // Show current step
+}
 
-        function nextStep() {
-            if (currentStep < 3) {
-                currentStep++;
-                showStep(currentStep);
-            }
-        }
+function nextStep() {
+    if (currentStep < 4) { // Only allow moving forward if we are not at the last step
+        currentStep++;
+        showStep(currentStep);
+    }
+}
 
-        function prevStep() {
-            if (currentStep > 1) {
-                currentStep--;
-                showStep(currentStep);
-            }
-        }
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+    }
+}
+
+function tryNext() {
+    // Reset the form by clearing all input fields
+    document.getElementById("sizeForm").reset();
+    
+    // Set currentStep to 1 and show the first step
+    currentStep = 1;
+    showStep(currentStep);
+
+    // Optionally, clear any previous suggestion
+    document.querySelectorAll('.form-step').forEach(function(stepElement) {
+        stepElement.classList.remove('form-step-active');
+        stepElement.classList.add('d-none'); // Hide all steps
+    });
+    document.getElementById('step-1').classList.remove('d-none');
+    document.getElementById('step-1').classList.add('form-step-active');
+}
     </script>
 </body>
 

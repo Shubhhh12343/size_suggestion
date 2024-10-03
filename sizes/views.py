@@ -3,20 +3,21 @@ from .models import FemaleTopSize, FemaleBottomSize, MaleTopSize, MaleBottomSize
 
 def chest_size_view(request):
     suggestion = None
-    chest_size = None
     gender = None
     clothing_type = None
-    error_message = None
-    size_input = None
+    size_input = None  # Initialize size_input with None to avoid UnboundLocalError
 
     if request.method == 'POST':
+        print(f"{request.POST=}")
         gender = request.POST.get('gender')
         clothing_type = request.POST.get('clothing_type')
         size_input = request.POST.get('size_input')
 
         try:
             size_input = int(size_input)
+            print(f"Received size input: {size_input}")
 
+            # Check which model to filter based on gender and clothing type
             if gender == 'male' and clothing_type == 'top':
                 suggestion = MaleTopSize.objects.filter(chest=size_input).first()
             elif gender == 'male' and clothing_type == 'bottom':
@@ -26,16 +27,21 @@ def chest_size_view(request):
             elif gender == 'female' and clothing_type == 'bottom':
                 suggestion = FemaleBottomSize.objects.filter(waist=size_input).first()
 
-            # If no size is found, set an error message
-            if not suggestion:
-                error_message = f"No matching size found for {size_input}."
+            print(f"Suggestion: {suggestion}")
         except (ValueError, TypeError):
-            error_message = "Invalid size input. Please enter a valid number."
+            suggestion = None  # Handle invalid inputs
+            print("Invalid size input")
+
+        # Debugging prints
+        print(f"Gender: {gender}, Clothing Type: {clothing_type}, Size Input: {size_input}")
+        if suggestion:
+            print(f"Suggestion Size: {suggestion.size if hasattr(suggestion, 'size') else 'No size found'}")
+        else:
+            print("No suggestion found")
 
     return render(request, 'chest_size.html', {
         'suggestion': suggestion,
         'gender': gender,
         'clothing_type': clothing_type,
-        'error_message': error_message,
-        'size_input': size_input  # For displaying the entered size in case of error
+        'size_input': size_input  # Fixing to pass the correct size_input
     })
