@@ -2,6 +2,10 @@ from django.shortcuts import render
 from .models import FemaleTopSize, FemaleBottomSize, MaleTopSize, MaleBottomSize
 
 def chest_size_view(request):
+    session_data = request.session.items()  # Retrieves all session data as key-value pairs
+    print(session_data)
+    for key, value in session_data:
+        print(f"{key}: {value}")
     suggestion = None
     gender = None
     clothing_type = None
