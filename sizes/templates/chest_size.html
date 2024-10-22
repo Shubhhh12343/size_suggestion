@@ -51,7 +51,7 @@
             max-width: 450px;
             width: 100%;
             height: 100%;
-            max-height: 250px;
+            max-height: 260px;
             background-color: #faf7f7;
             border: none;
         }
@@ -208,37 +208,54 @@
     font-size: small;
 }
 
+.placeholder-small::placeholder {
+        font-size: 12px; /* Adjust this value for desired size */
+    }
+    .fit-option {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border-radius: 8px;
+        cursor: pointer;
+    }
 
+    .fit-option:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .fit-option.selected {
+        border: 2px solid #007bff; /* Blue border for selected */
+        background-color: rgba(0, 123, 255, 0.1); /* Light blue background for selected */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
     </style>
 </head>
 
-<body class="d-flex justify-content-center align-items-center vh-100 bg-dange">
+<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
     <div class="card shadow-sm">
         <div class="card-body">
-
             <form method="post" id="sizeForm" action="{% url 'chest_size' %}" class="form-group">
                 {% csrf_token %}
                 <input type="hidden" name="fit_preference" id="fit_preference">
-
 
                 <!-- Step 1: Initial Prompt -->
                 <div class="form-step {% if not suggestion %} form-step-active {% endif %}" id="step-1">
                     <span class="mx-2" style="color: #00008B;"><b>SWAP VTO</b></span>
                     <div class="form-section mt-3">
-                        <span class="form-header-text1  "  style="margin-top: 30px;">FINDING YOUR PERFECT FIT?</span>
+                        <span class="form-header-text1" style="margin-top: 30px;">FINDING YOUR PERFECT FIT?</span>
                         <p style="font-size: small;">You are just a few clicks away...</p>
                     </div>
-                    <div class="form-footer" style="padding-top: 80px;">
+                    <div class="form-footer" style="padding-top: 90px;">
                         <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="nextStep()">Let's Go</button>
                     </div>
                 </div>
 
                 <!-- Step 2: Gender Selection -->
-                <div class="form-step {% if not suggestion %} d-none {% endif %}" id="step-2">
+                <div class="form-step d-none" id="step-2">
                     <div class="form-section">
                         <h class="form-header-text">SELECT YOUR GENDER</h>
                         <p>Help us identify your preference</p>
-                        <div class="d-flex align-items-center  justify-content-center mt-5">
+                        <div class="d-flex align-items-center justify-content-center mt-5">
                             <div class="form-check form-check-inline form-check-sm">
                                 <input type="radio" id="male" name="gender" value="male" class="form-check-input" required>
                                 <label for="male" class="form-check-label">Male</label>
@@ -247,213 +264,211 @@
                                 <input type="radio" id="female" name="gender" value="female" class="form-check-input mx-2" required>
                                 <label for="female" class="form-check-label">Female</label>
                             </div>
+                            <div class="form-check form-check-inline form-check-sm">
+                                <input type="radio" id="other" name="gender" value="other" class="form-check-input mx-2" required>
+                                <label for="other" class="form-check-label">Others</label>
+                            </div>
                         </div>
-
                     </div>
-                    <div class="form-footer" style="padding-top: 42px;padding-left: 10px;" >
-                        <button type="button" class="btn btn-sm btn-secondary"  onclick="prevStep()">Back</button>
+                    <div class="form-footer" style="padding-top: 52px; padding-left: 10px;">
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
                         <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="nextStep()">Next</button>
                     </div>
                 </div>
-                <!-- Step 3: Height Selection -->
-                <div class="form-step {% if not suggestion %} d-none {% endif %}" id="step-3">
+
+                <!-- Step 3: Clothing Type Selection -->
+                <div class="form-step d-none" id="step-3">
                     <div class="form-section">
-                        <h class="form-header-text">Your Height</h>
+                        <h class="form-header-text">WHAT ARE YOU LOOKING FOR?</h>
+                        <p>Are you looking for tops or bottoms?</p>
+                        <div class="d-flex justify-content-center mt-5">
+                            <div class="form-check form-check-inline form-check-sm">
+                                <input type="radio" id="top" name="clothing_type" value="top" class="form-check-input" required onclick="updateInputFields('top')">
+                                <label for="top" class="form-check-label">Tops/Shirts</label>
+                            </div>
+                            <div class="form-check form-check-inline form-check-sm">
+                                <input type="radio" id="bottom" name="clothing_type" value="bottom" class="form-check-input mx-2" required onclick="updateInputFields('bottom')">
+                                <label for="bottom" class="form-check-label">Bottoms/Jeans</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-footer" style="padding-top: 52px; padding-left: 10px;">
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
+                        <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Height and Size Input -->
+                <div class="form-step d-none" id="step-4">
+                    <div class="form-section">
+                        <h class="form-header-text">YOUR HEIGHT AND CHEST</h>
                         <p style="font-size: small;">Help us identify your preference</p>
-                        <div class="d-flex align-items-center justify-content-center mt-5">
+                        <div class="d-flex align-items-center justify-content-center mt-4">
                             <div class="row">
                                 <div class="col">
+                                    <label for="height_feet" class="form-label">Feet</label>
                                     <div class="input-group">
                                         <input type="number" id="height_feet" name="height_feet" min="4" max="7" class="form-control" style="height: 33px;" required>
                                         <span class="input-group-text">ft</span>
                                     </div>
                                 </div>
                                 <div class="col">
+                                    <label for="height_inches" class="form-label">Inches</label>
                                     <div class="input-group">
-                                        <input type="number" id="height_inches" name="height_inches" min="0" max="11" class="form-control" required style="height: 33px;">
+                                        <input type="number" id="height_inches" name="height_inches" style="height: 33px;" min="0" max="11" class="form-control" required>
+                                        <span class="input-group-text">in</span>
+                                    </div>
+                                </div>
+                                <div class="col" id="chest_size_container">
+                                    <label for="chest_size" class="form-label">Chest Size</label>
+                                    <div class="input-group">
+                                        <input type="number" id="chest_size" name="chest_size" min="30" max="60" style="height: 33px;" class="form-control placeholder-small" placeholder="Chest" style="height: 33px;">
+                                        <span class="input-group-text">in</span>
+                                    </div>
+                                </div>
+                                <div class="col d-none" id="waist_size_container">
+                                    <label for="waist_size" class="form-label">Waist Size</label>
+                                    <div class="input-group">
+                                        <input type="number" id="waist_size" name="waist_size" min="24" max="50" class="form-control placeholder-small" placeholder="Waist" style="height: 33px;">
                                         <span class="input-group-text">in</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-footer" style="padding-top: 35px; padding-left: 10px;">
+                    <div class="form-footer" style="padding-top: 38px; padding-left: 10px;">
                         <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
                         <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="nextStep()">Next</button>
                     </div>
                 </div>
 
-                <!-- Step 4: Clothing Type Selection -->
-                <div class="form-step {% if not suggestion %} d-none {% endif %}" id="step-4">
-                    <div class="form-section">                      
-                        <h class="form-header-text">WHAT ARE YOU LOOKING FOR?</h>
-                        <p>Are you looking for tops or bottoms?</p>
-                        <div class="d-flex justify-content-center mt-5">
-                            <div class="form-check form-check-inline form-check-sm">
-                                <input type="radio" id="top" name="clothing_type" value="top" class="form-check-input" required>
-                                <label for="top" class="form-check-label ">Tops/Shirts</label>
-                            </div>
-                            <div class="form-check form-check-inline form-check-sm">
-                                <input type="radio" id="bottom" name="clothing_type" value="bottom" class="form-check-input mx-2" required>
-                                <label for="bottom" class="form-check-label">Bottoms/Jeans</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-footer" style="padding-top: 42px;padding-left: 10px;">
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
-                        <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="nextStep()">Next</button>
-                    </div>
-                </div>
+
                 <!-- Step 5: Fit Selection -->
-                <div class="form-step {% if not suggestion %} d-none {% endif %}" id="step-5">
-                    <div class="form-section">                      
-                        <h class="form-header-text">Your fit preference</h>
+                <div class="form-step d-none" id="step-5">
+                    <div class="form-section">
+                        <h class="form-header-text">YOUR FIT PREFERENCE</h>
                         <p>I want this item to fit...</p>
                         <div class="d-flex justify-content-center">
                             <div class="row">
-                                <div class="col text-center" onclick="selectFitPreference('slim')">
-                                    <img src="{% static 'slim-removebg-preview.png' %}" height="90px" width="90px">
-                                    <p>Slim</p>
+                                <div class="col text-center" id="fit-slim" onclick="selectFitPreference('slim')">
+                                    <img src="{% static 'slim-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
+                                    <p class="mt-2">Slim</p>
                                 </div>
-                                <div class="col text-center" onclick="selectFitPreference('avg')">
-                                    <img src="{% static 'avg-removebg-preview.png' %}" height="90px" width="90px">
-                                    <p>Average</p>
+                                <div class="col text-center" id="fit-avg" onclick="selectFitPreference('avg')">
+                                    <img src="{% static 'avg-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
+                                    <p class="mt-2">Average</p>
                                 </div>
-                                <div class="col text-center" onclick="selectFitPreference('loose')">
-                                    <img src="{% static 'loose-removebg-preview.png' %}" height="90px" width="90px">
-                                    <p>Loose</p>
+                                <div class="col text-center" id="fit-loose" onclick="selectFitPreference('loose')">
+                                    <img src="{% static 'loose-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
+                                    <p class="mt-2">Loose</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-footer" style="position: relative; bottom: 26px;padding-left: 10px;"  >
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
-                        <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="nextStep()">Next</button>
-                    </div>
-                </div>
-                
-
-                <!-- Step 5: Size Input -->
-                <div class="d-none" id="step-6">
-                    <div class="form-section">
-                        <h class=" text-center" style="font-weight: bold;">FIND YOUR SIZE</h>
-                        <p>Slide your size please</p>
-                        <div class="py-4">
-                            <!-- <label class="form-header-text">ENTER YOUR SIZE</label> -->
-                            <!-- Slider Input -->
-                            <div class="d-flex justify-content-center align-items-center">
-                                <input type="range" id="size_slider" name="size_input" min="32" max="50" step="2" value="36" class="form-range" oninput="updateSizeValue(this.value)">
-                                <span id="size_value" class="ms-2" style="font-weight: bold; font-size: large;">36</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-footer" style="padding-top: 25px;padding-left: 10px;">
+                    <div class="form-footer" style="position: relative; bottom: 23px; padding-left: 10px;">
                         <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
                         <button type="submit" class="btn btn-sm btn-primary let-go-btn">Submit</button>
                     </div>
                 </div>
 
                 <!-- Step 6: Size Suggestion -->
-                <div class="form-step {% if suggestion %} form-step-active {% endif %}" id="step-7">
+                <div class="form-step {% if suggestion %} form-step-active {% endif %}" id="step-6">
                     <div class="form-section d-flex align-items-center m-0 p-0">
-                        <img  src="{% static 'output-onlinegiftools.gif' %}" class="h-100px " alt="Fit image"  height="220px" width="200px">
+                        <img src="{% static 'output-onlinegiftools.gif' %}" class="h-100px" alt="Fit image" height="220px" width="200px">
                         <div class="ms-3">
                             <h>WE HAVE GOT A FIT FOR YOU</h>
                             {% if suggestion %}
-                            <p>A <strong>{{ suggestion.size }}</strong> sized chosen from {{ clothing_type }}.</p>
-                            {% if gender == 'male' and clothing_type == 'top' %}
-                            <p>Chest: {{ suggestion.chest }}, Length: {{ suggestion.length }}</p>
-                            {% elif gender == 'female' and clothing_type == 'top' %}
-                            <p>Chest: {{ suggestion.chest }}, Length: {{ suggestion.length }}</p>
-                            {% elif gender == 'male' and clothing_type == 'bottom' %}
-                            <p>Waist: {{ suggestion.waist }}, Hip: {{ suggestion.hip }}</p>
-                            {% elif gender == 'female' and clothing_type == 'bottom' %}
-                            <p>Waist: {{ suggestion.waist }}, Hip: {{ suggestion.hip }}</p>
+                                <p>Your suggested size is: <b>{{ suggestion }}</b></p>
                             {% endif %}
-                            {% else %}
-                            <p>No matching size found for your input.</p>
-                            {% endif %}
+                            <p class="pt-3">
+                                For your height of {{ height_feet }} feet {{ height_inches }} inches and 
+                                {% if clothing_type == 'top' %}
+                                    chest size of {{ chest_size }} inches.
+                                {% elif clothing_type == 'bottom' %}
+                                    waist size of {{ waist_size }} inches.
+                                {% else %}
+                                    size.
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
-                    <div class="form-footer"  style="position: relative; bottom: 40px;">
-                        <button type="button" class="btn btn-sm btn-primary let-go-btn  " onclick="tryNext()">Restart</button>
+                     <div class="form-footer"  style="position: relative; bottom: 30px;">
+                        <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="resetForm()">Restart</button>
                     </div>
                 </div>
-
+                
             </form>
-
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- JavaScript for Multi-Step Form -->
     <script>
-        let currentStep = 1;
-
-function showStep(step) {
-    // Hide all steps initially
-    document.querySelectorAll('.form-step').forEach(function (stepElement) {
-        stepElement.classList.remove('form-step-active');
-        stepElement.classList.add('d-none');
-    });
-    // Show the desired step
-    document.getElementById('step-' + step).classList.remove('d-none');
-    document.getElementById('step-' + step).classList.add('form-step-active');
-}
-
-function nextStep() {
-    // Only allow moving forward if we are not at the last step
-    if (currentStep < 6) {
-        currentStep++;
-        showStep(currentStep);
-    }
-}
-
-function prevStep() {
-    // Only move back if we are not at the first step
-    if (currentStep > 1) {
-        currentStep--;
-        showStep(currentStep);
-        
-        // Hide 'Find Your Size' card if navigating back from step-6
-        if (currentStep < 6) {
-            document.getElementById('step-6').classList.add('d-none');
+        function nextStep() {
+            const currentStep = document.querySelector('.form-step-active');
+            if (currentStep) {
+                currentStep.classList.remove('form-step-active');
+                currentStep.classList.add('d-none');
+                currentStep.nextElementSibling.classList.add('form-step-active');
+                currentStep.nextElementSibling.classList.remove('d-none');
+            }
         }
-    }
-}
 
-function tryNext() {
-    // Reset the form by clearing all input fields
-    document.getElementById("sizeForm").reset();
+        function prevStep() {
+            const currentStep = document.querySelector('.form-step-active');
+            if (currentStep) {
+                currentStep.classList.remove('form-step-active');
+                currentStep.classList.add('d-none');
+                currentStep.previousElementSibling.classList.add('form-step-active');
+                currentStep.previousElementSibling.classList.remove('d-none');
+            }
+        }
 
-    // Set currentStep to 1 and show the first step
-    currentStep = 1;
-    showStep(currentStep);
-}
+        function updateInputFields(type) {
+            if (type === 'top') {
+                document.getElementById('chest_size_container').classList.remove('d-none');
+                document.getElementById('waist_size_container').classList.add('d-none');
+            } else {
+                document.getElementById('chest_size_container').classList.add('d-none');
+                document.getElementById('waist_size_container').classList.remove('d-none');
+            }
+        }
 
+        // function selectFitPreference(preference) {
+        //     document.getElementById('fit_preference').value = preference;
+        // }
     </script>
-
+    
     <script>
-        function updateSizeValue(value) {
-    document.getElementById('size_value').textContent = value;
-}
-
+        function resetForm() {
+            // Reset the form inputs
+            const form = document.getElementById('sizeForm'); // Ensure 'sizeForm' is the correct form ID
+            form.reset(); 
+    
+            // Hide all form steps
+            const steps = document.querySelectorAll('.form-step');
+            steps.forEach(step => step.classList.remove('form-step-active'));
+    
+            // Show the first step
+            document.getElementById('step-1').classList.add('form-step-active'); // Ensure 'step-1' is the correct ID for the first step
+    
+            // Reset any other UI states if necessary (e.g., error messages or suggestions)
+            document.querySelector('.suggestion-message').innerHTML = ''; // Clear any suggestion messages
+        }
     </script>
-
-<script>
-    function selectFitPreference(preference) {
-    // Set the fit preference value in a hidden input
-    document.getElementById('fit_preference').value = preference;
-
-    // Show the size suggestion card
-    document.getElementById('step-6').classList.remove('d-none');
-
-    // Optionally, hide the fit preference section
-    document.getElementById('step-5').classList.add('d-none');
+   <script>
+    function selectFitPreference(fit) {
+    // Remove 'selected' class from all options
+    document.querySelectorAll('.fit-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    // Add 'selected' class to the clicked option
+    const selectedOption = document.querySelector(`#fit-${fit} .fit-option`);
+    selectedOption.classList.add('selected');
+    
+    // Update a hidden input field to keep track of the selected preference
+    document.getElementById('fit_preference').value = fit;
 }
 
 </script>
+    
 </body>
-
 </html>

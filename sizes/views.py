@@ -1,59 +1,93 @@
 from django.shortcuts import render
-from .models import FemaleTopSize, FemaleBottomSize, MaleTopSize, MaleBottomSize
+from .models import MaleTopSize, MaleBottomSize, FemaleTopSize, FemaleBottomSize
+import logging
+
+logger = logging.getLogger(__name__)
 
 def chest_size_view(request):
-    suggestion = None
-    gender = None
-    clothing_type = None
-    size_input = None
-    height_feet = None
-    height_inches = None
-    fit_preference = None  # New variable to capture fit preference
-
+    malebottomsize = MaleBottomSize.objects.all().values()
     if request.method == 'POST':
-        print(f"Request POST Data: {request.POST}")
-        gender = request.POST.get('gender')
-        clothing_type = request.POST.get('clothing_type')
-        size_input = request.POST.get('size_input')
-        height_feet = request.POST.get('height_feet')
-        height_inches = request.POST.get('height_inches')
-        fit_preference = request.POST.get('fit_preference')  # Capture fit preference
+        logger.debug(f"Request data: {request.POST}")
 
         try:
-            size_input = int(size_input)
-            height_feet = int(height_feet)
-            height_inches = int(height_inches)
-            height_total_inches = (height_feet * 12) + height_inches
-            print(f"Received size input: {size_input}, height: {height_total_inches} inches, fit preference: {fit_preference}")
+            # Retrieve form data
+            gender = request.POST.get('gender')
+            clothing_type = request.POST.get('clothing_type')
+            height_feet = int(request.POST.get('height_feet', 0))
+            height_inches = int(request.POST.get('height_inches', 0))
+            fit_preference = request.POST.get('fit_preference', 'avg')
 
-            # Determine size suggestion based on fit preference
-            if gender == 'male' and clothing_type == 'top':
-                suggestion = MaleTopSize.objects.filter(chest=size_input, fit_preference=fit_preference).first()
-            elif gender == 'male' and clothing_type == 'bottom':
-                suggestion = MaleBottomSize.objects.filter(waist=size_input, fit_preference=fit_preference).first()
-            elif gender == 'female' and clothing_type == 'top':
-                suggestion = FemaleTopSize.objects.filter(chest=size_input, fit_preference=fit_preference).first()
-            elif gender == 'female' and clothing_type == 'bottom':
-                suggestion = FemaleBottomSize.objects.filter(waist=size_input, fit_preference=fit_preference).first()
+            # Convert height to total inches
+            total_height_in_inches = (height_feet * 12) + height_inches
+            logger.debug(f'Total height in inches: {total_height_in_inches}')
 
-            print(f"Suggestion: {suggestion}")
-        except (ValueError, TypeError):
-            suggestion = None
-            print("Invalid size input or height input")
+            # Normalize 'other' to 'male' for processing
+            if gender == 'other':
+                gender = 'male'
+            logger.debug(f'Normalized gender: {gender}')
 
-        # Debugging prints
-        print(f"Gender: {gender}, Clothing Type: {clothing_type}, Size Input: {size_input}, Height: {height_feet}ft {height_inches}in")
-        if suggestion:
-            print(f"Suggestion Size: {suggestion.size if hasattr(suggestion, 'size') else 'No size found'}")
-        else:
-            print("No suggestion found")
+            # Initialize suggested size variable
+            suggested_size = None
+            chest_size = waist_size = None
+            
+            # Retrieve size based on clothing type
+            if clothing_type == 'top':
+                chest_size = int(request.POST.get('chest_size', 0))
+                suggested_size = get_top_size_suggestion(gender, chest_size, fit_preference)
+            elif clothing_type == 'bottom':
+                waist_size = int(request.POST.get('waist_size', 0))
+                suggested_size = get_bottom_size_suggestion(gender, waist_size, fit_preference)
+                print(f"{suggested_size}")
+            logger.debug(f'Suggested Size: {suggested_size}')
 
-    return render(request, 'chest_size.html', {
-        'suggestion': suggestion,
-        'gender': gender,
-        'clothing_type': clothing_type,
-        'size_input': size_input,
-        'height_feet': height_feet,
-        'height_inches': height_inches,
-        'fit_preference': fit_preference  # Pass fit preference to template if needed
-    })
+            # Handle cases where no suggestion is found
+            suggestion_display = suggested_size if suggested_size else 'N/A'
+
+            context = {
+                'gender': gender,
+                'clothing_type': clothing_type,
+                'suggestion': suggestion_display,
+                'height_feet': height_feet,
+                'height_inches': height_inches,
+                'chest_size': chest_size,
+                'waist_size': waist_size,
+            }
+            
+            return render(request, 'chest_size.html', context)
+        except ValueError as ve:
+            logger.error(f'ValueError processing request: {ve}')
+            context = {'error_message': 'Invalid input values. Please check your entries.'}
+            return render(request, 'chest_size.html', context)
+        except Exception as e:
+            logger.error(f'Error processing request: {e}')
+            context = {'error_message': 'An error occurred while processing your request.'}
+            return render(request, 'chest_size.html', context)
+
+    return render(request, 'chest_size.html')
+
+
+
+
+
+
+def get_top_size_suggestion(gender, chest_size, fit_preference):
+    if gender == 'male':
+        suggestion =  MaleTopSize.objects.filter(chest=chest_size, fit_preference=fit_preference).first()
+    elif gender == 'female':
+        suggestion =  FemaleTopSize.objects.filter(chest=chest_size, fit_preference=fit_preference).first()
+    else:
+        suggestion =  None
+
+    return suggestion.size if suggestion else None
+
+def get_bottom_size_suggestion(gender, waist_size, fit_preference):
+    if gender == 'male':
+        suggestion = MaleBottomSize.objects.filter(waist=waist_size, fit_preference=fit_preference).first()
+    elif gender == 'female':
+        suggestion = FemaleBottomSize.objects.filter(waist=waist_size, fit_preference=fit_preference).first()
+    else:
+        suggestion = None
+
+    # Return the size if a suggestion is found; otherwise, return None to handle it in the view.
+    return suggestion.size if suggestion else None
+
