@@ -12,13 +12,13 @@
         font-family: 'Baloo Bhai';
           src: url('{% static 'fonts/BalooBhai2-Regular.ttf' %}?v=20240228') format('truetype');
       }
-   
-     
+
+
         body {
             background-color: white;
             font-family: 'Baloo Bhai', sans-serif;
 
-            
+
         }
         ::data-placeholder {
           font-size: 5px;
@@ -73,7 +73,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            
+
         }
 
         .form-header-text {
@@ -83,8 +83,8 @@
         .form-header-text1 {
             text-align: left;
             font-weight: bold;
-           
-           
+
+
         }
 
         .let-go-btn {
@@ -223,11 +223,23 @@
     }
 
     .fit-option.selected {
-        border: 2px solid #007bff; /* Blue border for selected */
+        border: 1px solid #007bff; /* Blue border for selected */
         background-color: rgba(0, 123, 255, 0.1); /* Light blue background for selected */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transform: scale(1.05);
     }
+    .error-message {
+    color: #b02a37;          /* Text color for error messages */
+    font-size: 11px;  /* Font size for error messages */
+}
+/* Add this CSS to maintain the input height when hidden */
+.hidden-input {
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
     </style>
 </head>
 
@@ -242,7 +254,7 @@
                 <div class="form-step {% if not suggestion %} form-step-active {% endif %}" id="step-1">
                     <span class="mx-2" style="color: #00008B;"><b>SWAP VTO</b></span>
                     <div class="form-section mt-3">
-                        <span class="form-header-text1" style="margin-top: 30px;">FINDING YOUR PERFECT FIT?</span>
+                        <span class="form-header-text1">FINDING YOUR PERFECT FIT?</span>
                         <p style="font-size: small;">You are just a few clicks away...</p>
                     </div>
                     <div class="form-footer" style="padding-top: 90px;">
@@ -299,48 +311,66 @@
                 </div>
 
                 <!-- Step 4: Height and Size Input -->
+                <!-- Step 4: Height and Size Input -->
                 <div class="form-step d-none" id="step-4">
-                    <div class="form-section">
-                        <h class="form-header-text">YOUR HEIGHT AND CHEST</h>
-                        <p style="font-size: small;">Help us identify your preference</p>
-                        <div class="d-flex align-items-center justify-content-center mt-4">
-                            <div class="row">
-                                <div class="col">
-                                    <label for="height_feet" class="form-label">Feet</label>
-                                    <div class="input-group">
-                                        <input type="number" id="height_feet" name="height_feet" min="4" max="7" class="form-control" style="height: 33px;" required>
-                                        <span class="input-group-text">ft</span>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <label for="height_inches" class="form-label">Inches</label>
-                                    <div class="input-group">
-                                        <input type="number" id="height_inches" name="height_inches" style="height: 33px;" min="0" max="11" class="form-control" required>
-                                        <span class="input-group-text">in</span>
-                                    </div>
-                                </div>
-                                <div class="col" id="chest_size_container">
-                                    <label for="chest_size" class="form-label">Chest Size</label>
-                                    <div class="input-group">
-                                        <input type="number" id="chest_size" name="chest_size" min="30" max="60" style="height: 33px;" class="form-control placeholder-small" placeholder="Chest" style="height: 33px;">
-                                        <span class="input-group-text">in</span>
-                                    </div>
-                                </div>
-                                <div class="col d-none" id="waist_size_container">
-                                    <label for="waist_size" class="form-label">Waist Size</label>
-                                    <div class="input-group">
-                                        <input type="number" id="waist_size" name="waist_size" min="24" max="50" class="form-control placeholder-small" placeholder="Waist" style="height: 33px;">
-                                        <span class="input-group-text">in</span>
-                                    </div>
+                    <div class="form-section m-0 p-0">
+                        <h class="form-header-text">YOUR HEIGHT AND SIZE</h>
+                        <p>Help us identify your preference</p>
+                        <div class="height-input-section mt-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <label for="height" class="form-label">Your Height</label>
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="height_unit_toggle" onchange="toggleHeightUnit()">
+                                    <label class="form-check-label" for="height_unit_toggle">cm</label>
                                 </div>
                             </div>
+                            <div class="row mt-1">
+                                <div class="col-4 mt-1">
+                                    <div class="input-group" id="feet_input">
+                                        <input type="number" id="height_feet" name="height_feet" min="4" max="7" class="form-control" style="height: 33px;" >
+                                        <span class="input-group-text">ft</span>
+                                    </div>
+                                    <div class="error-message d-none" id="feet_error"></div>
+                                </div>
+                                <div class="col-4 mt-1">
+                                    <div class="input-group" id="inches_input">
+                                        <input type="number" id="height_inches" name="height_inches" style="height: 33px;" min="0" max="11" class="form-control" >
+                                        <span class="input-group-text">in</span>
+                                    </div>
+                                    <div class="error-message d-none" id="inches_error"></div>
+                                </div>
+                                <div class="col-8 mt-1 d-none" id="cm_input">
+                                    <div class="input-group">
+                                        <input type="number" id="height_cm" name="height_cm" min="120" max="230" style="height: 33px;" class="form-control">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                    <div class="error-message d-none" id="cm_error"></div>
+                                </div>
+
+                                <!-- Combined Chest and Waist Container -->
+                                <div class="col-4 mt-1">
+                                    <div class="input-group" id="chest_size_container">
+                                        <input type="number" id="chest_size" name="chest_size" min="30" max="60" class="form-control placeholder-small" placeholder="Chest" style="height: 33.5px;">
+                                        <span class="input-group-text">in</span>
+                                    </div>
+                                    <div class="input-group d-none" id="waist_size_container">
+                                        <input type="number" id="waist_size" name="waist_size" min="24" max="50" class="form-control placeholder-small" placeholder="Waist" style="height: 33.5px;">
+                                        <span class="input-group-text">in</span>
+                                    </div>
+                                    <div class="error-message d-none" id="chest_error"></div>
+                                    <div class="error-message d-none" id="waist_error"></div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
-                    <div class="form-footer" style="padding-top: 38px; padding-left: 10px;">
+                    <div class="form-footer" style="position: absolute; bottom: 24px; gap: 306px;padding-left: 10px;">
                         <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
-                        <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="nextStep()">Next</button>
+                        <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="validateStep4()">Next</button>
                     </div>
                 </div>
+
 
 
                 <!-- Step 5: Fit Selection -->
@@ -351,15 +381,15 @@
                         <div class="d-flex justify-content-center">
                             <div class="row">
                                 <div class="col text-center" id="fit-slim" onclick="selectFitPreference('slim')">
-                                    <img src="{% static 'slim-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
+                                    <img id="img-slim" src="{% static 'slim-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
                                     <p class="mt-2">Slim</p>
                                 </div>
                                 <div class="col text-center" id="fit-avg" onclick="selectFitPreference('avg')">
-                                    <img src="{% static 'avg-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
+                                    <img id="img-avg" src="{% static 'avg-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
                                     <p class="mt-2">Average</p>
                                 </div>
                                 <div class="col text-center" id="fit-loose" onclick="selectFitPreference('loose')">
-                                    <img src="{% static 'loose-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
+                                    <img id="img-loose" src="{% static 'loose-removebg-preview.png' %}" class="fit-option" height="90px" width="90px">
                                     <p class="mt-2">Loose</p>
                                 </div>
                             </div>
@@ -376,12 +406,16 @@
                     <div class="form-section d-flex align-items-center m-0 p-0">
                         <img src="{% static 'output-onlinegiftools.gif' %}" class="h-100px" alt="Fit image" height="220px" width="200px">
                         <div class="ms-3">
-                            <h>WE HAVE GOT A FIT FOR YOU</h>
+                            <h class="form-header-text">WE HAVE GOT A FIT FOR YOU</h>
                             {% if suggestion %}
-                                <p>Your suggested size is: <b>{{ suggestion }}</b></p>
+                                <p>Your suggested size is: <b style="color: #00008B;">{{ suggestion }}</b></p>
                             {% endif %}
                             <p class="pt-3">
-                                For your height of {{ height_feet }} feet {{ height_inches }} inches and 
+                                {% if height_cm %}
+                                    For your height of {{ height_cm }} cm and
+                                {% else %}
+                                    For your height of {{ height_feet }} feet {{ height_inches }} inches and
+                                {% endif %}
                                 {% if clothing_type == 'top' %}
                                     chest size of {{ chest_size }} inches.
                                 {% elif clothing_type == 'bottom' %}
@@ -392,25 +426,112 @@
                             </p>
                         </div>
                     </div>
-                     <div class="form-footer"  style="position: relative; bottom: 30px;">
+                    <div class="form-footer" style="position: relative; bottom: 30px;">
                         <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="resetForm()">Restart</button>
                     </div>
                 </div>
                 
+
             </form>
         </div>
     </div>
 
     <script>
-        function nextStep() {
-            const currentStep = document.querySelector('.form-step-active');
-            if (currentStep) {
-                currentStep.classList.remove('form-step-active');
-                currentStep.classList.add('d-none');
-                currentStep.nextElementSibling.classList.add('form-step-active');
-                currentStep.nextElementSibling.classList.remove('d-none');
+         function nextStep() {
+        const currentStep = document.querySelector('.form-step-active');
+        if (currentStep) {
+            currentStep.classList.remove('form-step-active');
+            currentStep.classList.add('d-none');
+
+            // Check for gender selection to determine the image source
+            if (currentStep.id === 'step-2') {
+                const selectedGender = document.querySelector('input[name="gender"]:checked');
+                if (selectedGender) {
+                    updateFitImages(selectedGender.value);
+                }
             }
+
+            currentStep.nextElementSibling.classList.add('form-step-active');
+            currentStep.nextElementSibling.classList.remove('d-none');
         }
+    }
+
+    function validateStep4() {
+    let valid = true;
+
+    // Clear previous error messages
+    document.querySelectorAll('.error-message').forEach(msg => {
+        msg.classList.add('d-none'); // Hide previous error messages
+        msg.textContent = ''; // Clear text
+    });
+
+    // Check which height input is visible and validate accordingly
+    const heightFeet = document.getElementById('height_feet');
+    const heightInches = document.getElementById('height_inches');
+    const heightCm = document.getElementById('height_cm');
+
+    // Validate height in feet
+    if (heightFeet.offsetWidth > 0 && (heightFeet.value === '' || heightFeet.value < 4 || heightFeet.value > 7)) {
+        document.getElementById('feet_error').textContent = 'Feet is required';
+        document.getElementById('feet_error').classList.remove('d-none');
+        valid = false;
+    }
+
+    // Validate height in inches
+    if (heightInches.offsetWidth > 0 && (heightInches.value === '' || heightInches.value < 0 || heightInches.value > 11)) {
+        document.getElementById('inches_error').textContent = 'Inches is required ';
+        document.getElementById('inches_error').classList.remove('d-none');
+        valid = false;
+    }
+
+    // Validate height in centimeters only if it's visible
+    if (heightCm.offsetWidth > 0 && (heightCm.value === '' || heightCm.value < 120 || heightCm.value > 230)) {
+        document.getElementById('cm_error').textContent = 'Centimeters is required';
+        document.getElementById('cm_error').classList.remove('d-none');
+        valid = false;
+    }
+
+    // Validate chest size only if it's visible
+    const chestSize = document.getElementById('chest_size');
+    if (chestSize.offsetWidth > 0 && chestSize.value === '') {
+        document.getElementById('chest_error').textContent = 'Chest size is required';
+        document.getElementById('chest_error').classList.remove('d-none');
+        valid = false;
+    }
+
+    // Validate waist size only if it's visible
+    const waistSize = document.getElementById('waist_size');
+    if (waistSize.offsetWidth > 0 && waistSize.value === '') {
+        document.getElementById('waist_error').textContent = 'Waist size is required';
+        document.getElementById('waist_error').classList.remove('d-none');
+        valid = false;
+    }
+
+    // Proceed to the next step if valid
+    if (valid) {
+        nextStep(); // Call your function to go to the next step
+    }
+}
+
+
+
+
+        function updateFitImages(gender) {
+        const slimImage = document.getElementById('img-slim');
+        const avgImage = document.getElementById('img-avg');
+        const looseImage = document.getElementById('img-loose');
+
+        if (gender === 'female') {
+            slimImage.src = "{% static 'womanslim-removebg-preview.png' %}";
+            avgImage.src = "{% static 'womanavg-removebg-preview.png' %}";
+            looseImage.src = "{% static 'womanloose-removebg-preview.png' %}";
+        } else {
+            slimImage.src = "{% static 'slim-removebg-preview.png' %}";
+            avgImage.src = "{% static 'avg-removebg-preview.png' %}";
+            looseImage.src = "{% static 'loose-removebg-preview.png' %}";
+        }
+    }
+
 
         function prevStep() {
             const currentStep = document.querySelector('.form-step-active');
@@ -423,52 +544,78 @@
         }
 
         function updateInputFields(type) {
-            if (type === 'top') {
-                document.getElementById('chest_size_container').classList.remove('d-none');
-                document.getElementById('waist_size_container').classList.add('d-none');
-            } else {
-                document.getElementById('chest_size_container').classList.add('d-none');
-                document.getElementById('waist_size_container').classList.remove('d-none');
-            }
-        }
+    if (type === 'top') {
+        document.getElementById('chest_size_container').classList.remove('d-none');
+        document.getElementById('waist_size_container').classList.add('d-none');
+    } else {
+        document.getElementById('chest_size_container').classList.add('d-none');
+        document.getElementById('waist_size_container').classList.remove('d-none');
+    }
+}
 
-        // function selectFitPreference(preference) {
-        //     document.getElementById('fit_preference').value = preference;
-        // }
-    </script>
-    
-    <script>
+
+        // Function to toggle between height units
+        function toggleHeightUnit() {
+    const cmInput = document.getElementById('cm_input');
+    const feetInput = document.getElementById('feet_input');
+    const inchesInput = document.getElementById('inches_input');
+    const toggleLabel = document.querySelector('label[for="height_unit_toggle"]');
+
+    if (cmInput.classList.contains('d-none')) {
+        // Switching to cm input, hide feet and inches
+        cmInput.classList.remove('d-none');
+        feetInput.classList.add('d-none');
+        inchesInput.classList.add('d-none');
+
+        // Update toggle label to show "in"
+        toggleLabel.textContent = 'in';
+
+        // Hide error messages for feet and inches
+        document.getElementById('feet_error').classList.add('d-none');
+        document.getElementById('inches_error').classList.add('d-none');
+    } else {
+        // Switching to feet and inches input, hide cm input
+        cmInput.classList.add('d-none');
+        feetInput.classList.remove('d-none');
+        inchesInput.classList.remove('d-none');
+
+        // Update toggle label to show "cm"
+        toggleLabel.textContent = 'cm';
+
+        // Hide error message for cm
+        document.getElementById('cm_error').classList.add('d-none');
+    }
+}
+
         function resetForm() {
             // Reset the form inputs
             const form = document.getElementById('sizeForm'); // Ensure 'sizeForm' is the correct form ID
-            form.reset(); 
-    
+            form.reset();
+
             // Hide all form steps
             const steps = document.querySelectorAll('.form-step');
             steps.forEach(step => step.classList.remove('form-step-active'));
-    
+
             // Show the first step
             document.getElementById('step-1').classList.add('form-step-active'); // Ensure 'step-1' is the correct ID for the first step
-    
+
             // Reset any other UI states if necessary (e.g., error messages or suggestions)
             document.querySelector('.suggestion-message').innerHTML = ''; // Clear any suggestion messages
         }
-    </script>
-   <script>
-    function selectFitPreference(fit) {
-    // Remove 'selected' class from all options
-    document.querySelectorAll('.fit-option').forEach(option => {
-        option.classList.remove('selected');
-    });
-    // Add 'selected' class to the clicked option
-    const selectedOption = document.querySelector(`#fit-${fit} .fit-option`);
-    selectedOption.classList.add('selected');
-    
-    // Update a hidden input field to keep track of the selected preference
-    document.getElementById('fit_preference').value = fit;
-}
 
-</script>
-    
+        function selectFitPreference(fit) {
+            // Remove 'selected' class from all options
+            document.querySelectorAll('.fit-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            // Add 'selected' class to the clicked option
+            const selectedOption = document.querySelector(`#fit-${fit} .fit-option`);
+            selectedOption.classList.add('selected');
+
+            // Update a hidden input field to keep track of the selected preference
+            document.getElementById('fit_preference').value = fit;
+        }
+    </script>
+
 </body>
 </html>
