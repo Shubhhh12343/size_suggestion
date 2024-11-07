@@ -319,25 +319,12 @@
             <div class="d-flex align-items-center justify-content-end">
                 <div class="form-check form-switch">
                     <input type="checkbox" class="form-check-input" id="height_unit_toggle" onchange="toggleHeightUnit()">
-                    <label class="form-check-label" for="height_unit_toggle">cm</label>
+                    <label class="form-check-label" for="height_unit_toggle">in</label>
                 </div>
             </div>
             <div class="row mt-1">
-                <div class="col-4 mt-1">
-                    <div class="input-group" id="feet_input">
-                        <input type="number" id="height_feet" name="height_feet" min="4" max="7" class="form-control" style="height: 33px;">
-                        <span class="input-group-text">ft</span>
-                    </div>
-                    <div class="error-message d-none" id="feet_error"></div>
-                </div>
-                <div class="col-4 mt-1">
-                    <div class="input-group" id="inches_input">
-                        <input type="number" id="height_inches" name="height_inches" style="height: 33px;" min="0" max="11" class="form-control">
-                        <span class="input-group-text">in</span>
-                    </div>
-                    <div class="error-message d-none" id="inches_error"></div>
-                </div>
-                <div class="col-8 mt-1 d-none" id="cm_input">
+                <!-- Centimeters Input Field -->
+                <div class="col-8" id="cm_input">
                     <div class="input-group">
                         <input type="number" id="height_cm" name="height_cm" min="120" max="230" style="height: 33px;" class="form-control placeholder-small" placeholder="Your Height">
                         <span class="input-group-text">cm</span>
@@ -345,12 +332,29 @@
                     <div class="error-message d-none" id="cm_error"></div>
                 </div>
 
-                <div class="col-4 mt-1">
-                    <div class="input-group" id="chest_size_container">
-                        <input type="number" id="chest_size" name="chest_size" min="30" max="60" class="form-control placeholder-small" placeholder="Chest (in)" style="height: 33.5px;">
-                        <span class="input-group-text" id="chest_unit">in</span>
+                <!-- Feet and Inches Input Fields (Hidden Initially) -->
+                <div class="col-4 d-none" id="feet_input">
+                    <div class="input-group">
+                        <input type="number" id="height_feet" name="height_feet" min="4" max="7" class="form-control" style="height: 33px;">
+                        <span class="input-group-text">ft</span>
                     </div>
-                    <div class="error-message text-danger d-none" id="chest_error"></div> <!-- Error message for chest size -->
+                    <div class="error-message d-none" id="feet_error"></div>
+                </div>
+                <div class="col-4 d-none" id="inches_input">
+                    <div class="input-group">
+                        <input type="number" id="height_inches" name="height_inches" style="height: 33px;" min="0" max="11" class="form-control">
+                        <span class="input-group-text">in</span>
+                    </div>
+                    <div class="error-message d-none" id="inches_error"></div>
+                </div>
+
+                <!-- Chest and Waist Size Inputs -->
+                <div class="col-4">
+                    <div class="input-group d-none" id="chest_size_container">
+                        <input type="number" id="chest_size" name="chest_size" min="30" max="60" class="form-control placeholder-small" placeholder="Chest (in)" style="height: 33.5px;">
+                        <span class="input-group-text">in</span>
+                    </div>
+                    <div class="error-message text-danger d-none" id="chest_error"></div>
                     
                     <div class="input-group d-none" id="chest_size_cm_container">
                         <input type="number" id="chest_size_cm" name="chest_size_cm" min="76" max="152" class="form-control placeholder-small" placeholder="Chest (cm)" style="height: 33.5px;">
@@ -362,23 +366,25 @@
                         <input type="number" id="waist_size_in" name="waist_size_in" min="24" max="50" class="form-control placeholder-small" placeholder="Waist (in)" style="height: 33.5px;">
                         <span class="input-group-text">in</span>
                     </div>
-                    <div class="error-message text-danger d-none" id="waist_error_in"></div> <!-- Error message for waist size in inches -->
+                    <div class="error-message text-danger d-none" id="waist_error_in"></div>
                     
                     <div class="input-group d-none" id="waist_size_cm_container">
                         <input type="number" id="waist_size_cm" name="waist_size_cm" min="61" max="127" class="form-control placeholder-small" placeholder="Waist (cm)" style="height: 33.5px;">
                         <span class="input-group-text">cm</span>
                     </div>
-                    <div class="error-message text-danger d-none" id="waist_error_cm"></div> <!-- Error message for waist size in cm -->
-                    
+                    <div class="error-message text-danger d-none" id="waist_error_cm"></div>
                 </div>
             </div>
         </div>
     </div>
+    
     <div class="form-footer" style="position: absolute; bottom: 19px; gap: 306px; padding-left: 10px;">
         <button type="button" class="btn btn-sm btn-secondary" onclick="prevStep()">Back</button>
         <button type="button" class="btn btn-sm btn-primary let-go-btn" onclick="validateStep4()">Next</button>
     </div>
 </div>
+
+
 
 
 
@@ -470,19 +476,26 @@
             }
         }
     
-        function clearHeightErrorMessages() {
+// Function to clear all height and size error messages
+function clearHeightErrorMessages() {
     const feetError = document.getElementById('feet_error');
     const inchesError = document.getElementById('inches_error');
     const cmError = document.getElementById('cm_error');
-    const chest_error = document.getElementById("chest_error")
-    const chest_error_cm = document.getElementById("chest_error_cm")
+    const chestError = document.getElementById('chest_error');
+    const chestErrorCm = document.getElementById('chest_error_cm');
+    const waistErrorIn = document.getElementById('waist_error_in');
+    const waistErrorCm = document.getElementById('waist_error_cm');
 
     if (feetError) feetError.classList.add('d-none');
     if (inchesError) inchesError.classList.add('d-none');
     if (cmError) cmError.classList.add('d-none');
-    if (chest_error_cm) chest_error_cm.classList.add('d-none');
+    if (chestError) chestError.classList.add('d-none');
+    if (chestErrorCm) chestErrorCm.classList.add('d-none');
+    if (waistErrorIn) waistErrorIn.classList.add('d-none');
+    if (waistErrorCm) waistErrorCm.classList.add('d-none');
 }
 
+// Function to validate the height and size fields on Step 4
 function validateStep4() {
     let valid = true;
 
@@ -494,16 +507,15 @@ function validateStep4() {
     const inchesError = document.getElementById('inches_error');
     const cmError = document.getElementById('cm_error');
     const chestError = document.getElementById('chest_error');
-    const waistError = document.getElementById('waist_error');
+    const chestErrorCm = document.getElementById('chest_error_cm');
+    const waistErrorIn = document.getElementById('waist_error_in');
+    const waistErrorCm = document.getElementById('waist_error_cm');
     const heightUnitToggle = document.getElementById('height_unit_toggle');
     const clothingType = document.querySelector('input[name="clothing_type"]:checked');
 
-    // Clear previous error messages for chest and waist
-    if (chestError) chestError.classList.add('d-none');
-    if (waistError) waistError.classList.add('d-none');
-
     // Validate height fields based on the selected unit
-    if (heightUnitToggle && heightUnitToggle.checked) {
+    if (heightUnitToggle && !heightUnitToggle.checked) {
+        // Default is centimeters (toggle is off)
         const heightCm = document.getElementById('height_cm');
         if (heightCm && !heightCm.value) {
             if (cmError) {
@@ -513,6 +525,7 @@ function validateStep4() {
             valid = false;
         }
     } else {
+        // Feet and inches (toggle is on)
         const heightFeet = document.getElementById('height_feet');
         const heightInches = document.getElementById('height_inches');
         if (heightFeet && !heightFeet.value) {
@@ -531,23 +544,29 @@ function validateStep4() {
         }
     }
 
-    // Validate chest or waist fields based on clothing type
+    // Validate chest or waist fields based on clothing type and unit toggle
     if (clothingType) {
         if (clothingType.value === 'top') {
-            const chestSize = heightUnitToggle.checked ? document.getElementById('chest_size_cm') : document.getElementById('chest_size');
+            // For tops, validate chest size based on unit toggle
+            const chestSize = heightUnitToggle.checked ? document.getElementById('chest_size') : document.getElementById('chest_size_cm');
+            const chestErrorField = heightUnitToggle.checked ? chestError : chestErrorCm;
+
             if (chestSize && !chestSize.value) {
-                if (chestError) {
-                    chestError.innerText = 'Chest size is required';
-                    chestError.classList.remove('d-none');
+                if (chestErrorField) {
+                    chestErrorField.innerText = `Chest size in ${heightUnitToggle.checked ? 'inches' : 'cm'} is required`;
+                    chestErrorField.classList.remove('d-none');
                 }
                 valid = false;
             }
         } else if (clothingType.value === 'bottom') {
-            const waistSize = heightUnitToggle.checked ? document.getElementById('waist_size_cm') : document.getElementById('waist_size_in');
+            // For bottoms, validate waist size based on unit toggle
+            const waistSize = heightUnitToggle.checked ? document.getElementById('waist_size_in') : document.getElementById('waist_size_cm');
+            const waistErrorField = heightUnitToggle.checked ? waistErrorIn : waistErrorCm;
+
             if (waistSize && !waistSize.value) {
-                if (waistError) {
-                    waistError.innerText = 'Waist size is required';
-                    waistError.classList.remove('d-none');
+                if (waistErrorField) {
+                    waistErrorField.innerText = `Waist size in ${heightUnitToggle.checked ? 'inches' : 'cm'} is required`;
+                    waistErrorField.classList.remove('d-none');
                 }
                 valid = false;
             }
@@ -559,7 +578,6 @@ function validateStep4() {
         nextStep();
     }
 }
-
 
 
 
@@ -630,8 +648,8 @@ document.querySelectorAll('input[name="clothing_type"]').forEach((element) => {
             }
         }
     
-        // Update input fields based on clothing type selection
-        function updateInputFields(clothingType) {
+        // Update input fields based on clothing type selection and height unit toggle
+function updateInputFields(clothingType) {
     const chestSizeContainer = document.getElementById('chest_size_container');
     const chestSizeCmContainer = document.getElementById('chest_size_cm_container');
     const waistSizeInContainer = document.getElementById('waist_size_in_container');
@@ -647,22 +665,22 @@ document.querySelectorAll('input[name="clothing_type"]').forEach((element) => {
     // Show appropriate input based on selected clothing type and unit toggle
     if (clothingType === 'top') {
         if (heightUnitToggle.checked) {
-            chestSizeCmContainer.classList.remove('d-none'); // Show chest size in cm if toggle is on
+            chestSizeContainer.classList.remove('d-none'); // Show chest size in inches if toggle is on
         } else {
-            chestSizeContainer.classList.remove('d-none'); // Show chest size in inches if toggle is off
+            chestSizeCmContainer.classList.remove('d-none'); // Show chest size in cm if toggle is off
         }
     } else if (clothingType === 'bottom') {
         if (heightUnitToggle.checked) {
-            waistSizeCmContainer.classList.remove('d-none'); // Show waist size in cm if toggle is on
+            waistSizeInContainer.classList.remove('d-none'); // Show waist size in inches if toggle is on
         } else {
-            waistSizeInContainer.classList.remove('d-none'); // Show waist size in inches if toggle is off
+            waistSizeCmContainer.classList.remove('d-none'); // Show waist size in cm if toggle is off
         }
     }
-    
 }
 
-  // Toggle between height in feet/inches and cm
-  function toggleHeightUnit() {
+
+ // Toggle between height in feet/inches and cm
+function toggleHeightUnit() {
     const heightUnitToggle = document.getElementById('height_unit_toggle');
     const feetInput = document.getElementById('feet_input');
     const inchesInput = document.getElementById('inches_input');
@@ -671,23 +689,24 @@ document.querySelectorAll('input[name="clothing_type"]').forEach((element) => {
 
     // Toggle height input visibility
     if (heightUnitToggle.checked) {
-        cmInput.classList.remove('d-none');
-        feetInput.classList.add('d-none');
-        inchesInput.classList.add('d-none');
-    } else {
+        // Show ft/in inputs and hide cm input
         cmInput.classList.add('d-none');
         feetInput.classList.remove('d-none');
         inchesInput.classList.remove('d-none');
+    } else {
+        // Show cm input and hide ft/in inputs
+        cmInput.classList.remove('d-none');
+        feetInput.classList.add('d-none');
+        inchesInput.classList.add('d-none');
     }
-
-    // Clear any height-related error messages when toggling the unit
-    clearHeightErrorMessages();
 
     // Update input fields for chest or waist size based on clothing type
     if (clothingType) {
         updateInputFields(clothingType.value);
     }
 }
+
+
 
 
 
