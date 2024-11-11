@@ -425,23 +425,24 @@
                         <img src="{% static 'output-onlinegiftools.gif' %}" class="h-100px" alt="Fit image" height="220px" width="200px">
                         <div class="ms-3">
                             <h class="form-header-text">WE HAVE GOT A FIT FOR YOU</h>
+                           
+                            <p class="">
+                                {% if height_cm and height_cm|length > 0 %}
+                                    For your height of {{ height_cm }} cm and
+                                {% else %}
+                                    For your height of {{ height_output }} and
+                                {% endif %}
+                                {% if clothing_type == 'top' %}
+                                    chest size of {{ chest_output }} .
+                                {% elif clothing_type == 'bottom' %}
+                                    waist size of {{ waist_output }}.
+                                {% else %}
+                                    size.
+                                {% endif %}
+                            </p>
                             {% if suggestion %}
-                <p>Your suggested size is: <b style="color: #00008B;">{{ suggestion }}</b></p>
-            {% endif %}
-            <p class="pt-3">
-                {% if height_cm and height_cm|length > 0 %}
-                    For your height of {{ height_cm }} cm and
-                {% else %}
-                    For your height of {{ height_output }} and
-                {% endif %}
-                {% if clothing_type == 'top' %}
-                    chest size of {{ chest_output }} .
-                {% elif clothing_type == 'bottom' %}
-                    waist size of {{ waist_output }}.
-                {% else %}
-                    size.
-                {% endif %}
-            </p>
+                            <p class="pt-3 form-header-text" style="font-size: large;">Your suggested size is: <b style="color: #00008B;">{{ suggestion }}</b></p>
+                        {% endif %}
 
                             
                         </div>
