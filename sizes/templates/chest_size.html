@@ -435,13 +435,13 @@
                                 {% if clothing_type == 'top' %}
                                     chest size of {{ chest_output }} .
                                 {% elif clothing_type == 'bottom' %}
-                                    waist size of {{ waist_output }}.
+                                waist size of {{ waist_output }}{% if suggested_length %}, with a suggested length of {{ suggested_length }}{% endif %}.
                                 {% else %}
                                     size.
                                 {% endif %}
                             </p>
                             {% if suggestion %}
-                            <p class="pt-3 form-header-text" style="font-size: large;">Your suggested size is: <b style="color: #00008B;">{{ suggestion }}</b></p>
+                            <p class="pt-3 " style="font-size:18px;">Your suggested size is: <span style="color: #00008B;font-weight: bolder;">{{ suggestion }}</span></p>
                         {% endif %}
 
                             
